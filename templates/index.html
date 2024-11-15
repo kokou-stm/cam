@@ -1,0 +1,200 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'videoapp/css/styles.css' %}">
+
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+
+
+</head>
+
+<body class="merriweather" style="background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));">
+    <!--img src="{% static 'videoapp/img/image.png' %}" alt="Example"-->
+
+    <div class="container mt-5 justify-content-center align-items-center">
+        <div class="row">
+            <div class="col-md-12 d-flex" id="videodiv">
+                <div class="card  text-center flex-fill"
+                    style="background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));">
+                    <div class="card-header  text-light">
+                        <div class="row redressed">
+                            <div class="col">
+                                <label for="languageSelect">Langue</label>
+                                <select id="languageSelect">
+                                    <!--option value="Origin">Origin</option-->
+                                    <option value="en-US">English</option>
+                                    <option value="fr-FR">French</option>
+                                    <option value="es-ES">Spanish</option>
+                                    <option value="zh-CN">Chinese</option>
+                                    <option value="hi-IN">Hindi</option>
+                                    <!-- Ajoutez d'autres options de langue selon vos besoins -->
+                                </select>
+
+
+                            </div>
+                            <div class="col">
+                                Video Call
+                                <button id="handpopup" class="btn btn-danger mr-2" type="button"
+                                    style="visibility: hidden; border-radius: 4em; font-size: 1em;">
+                                    <i class="fas fa-hand-point-up"></i> {{request.user.username}}
+                                </button>
+                            </div>
+                            <div class="col">
+                                <p id="timecounter">00:00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body ">
+                        <div class="row " id="video-grid" style="min-height: 55vh;">
+                        </div>
+                        <div class="card-footer text-muted " id="card-foot-1">
+                            <!--div class="btn-group" role="group" aria-label="Basic example">
+                        <button id="startButton" class="btn btn-outline-light me-2 " style="border-radius: 3em;">Start</button>
+                        <button id="stopButton"  class="btn btn-outline-light " style="border-radius: 3em;" disabled>Stop</button>
+                       </div-->
+                            <!--div class="row text-center">
+                        <p>Hello {{request.user}}
+                        
+                            {% if request.user.is_authenticated  %}
+                          <a href = "{% url 'logout' %}">Logout</a>
+                            {% endif %} </p>
+                       </div-->
+                            <br>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <label for="output">Transcript </label>
+                                    <div id="output"></div>
+                                </div>
+                                <div class="col-md-2">
+                                    <a id="chatbutton_1" href="{% url 'chat_ai' %}" class="btn btn-outline-light me-4"
+                                        type="button" style="border-radius: 4em; font-size: 1em;">
+                                        <i id="chaticon_1" class="fas fa-comment"></i>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-3 d-flex">
+                <div class="card text-center flex-fill" id="chatarea"
+                    style="background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5)); display: none;">
+                    <h5 class="card-header text-light" style="font-size: medium;">Chat</h5>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <div class="bg-light col-md-12 py-1" id="text_chat" style="min-height: 55vh;">
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="input-group mb-2">
+                            <button class="input-group-text" id="fileselect"><i class="fas fa-file"></i></button>
+                            <input type="file" id="fileInput" style="display:none;">
+                            <span id="filePreview" class="form-control text-dark"
+                                style="background-color: #e9ecef; display:inline-block;">No file</span>
+                            <button id="sendFileButton" class="btn btn-outline-light mx-2"
+                                style="border-radius: 4em; font-size: 1em; display:none;">
+
+                                <i id="check" class="fas fa-check"></i>
+
+                            </button>
+
+                            <button id="removeFileButton" class="btn btn-outline-light me-2"
+                                style="border-radius: 4em; font-size: 1em; display:none;">
+                                X </button>
+
+                        </div>
+
+                        <div class="input-group mb-2">
+                            <input type="text" id="id_message_send_input" class="form-control" placeholder="Message"
+                                aria-label="Message" aria-describedby="basic-addon1">
+                            <button id="id_message_send_button" type="submit"><span class="input-group-text"
+                                    id="basic-addon1"><i class="fas fa-paper-plane"></i></span></button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card mt-2"
+            style="background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));  border: solid rgb(167, 152, 152) 1px; border-radius: 2em;">
+
+
+            <div class="card-footer  py-2"
+                style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)); border-radius: 2em;">
+                <div class="d-flex justify-content-center">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+
+                        <button id="videobutton" class="btn btn-outline-light me-2" type="button"
+                            style="border-radius: 4em; font-size: 1em;">
+                            <i id="videoicon" class="fas fa-video"></i>
+                        </button>
+                        <button id="microphonebut" class="btn btn-outline-light me-2" type="button"
+                            style="border-radius: 4em; font-size: 1em;">
+                            <i id="microphoneicon" class="fas fa-microphone"></i>
+                        </button>
+
+                        <button id="screenShareButton" class="btn btn-outline-light me-2" type="button"
+                            style="border-radius: 4em; font-size: 1em;">
+                            <i id="screenShareIcon" class="fas fa-desktop"></i>
+                        </button>
+                        <button id="headphonesButton" class="btn btn-outline-light me-2" type="button"
+                            style="border-radius: 4em; font-size: 1em;">
+                            <i id="headphonesIcon" class="fas fa-headphones"></i>
+                        </button>
+                        <button id="handButton" class="btn btn-outline-light me-2" type="button"
+                            style="border-radius: 4em; font-size: 1em;">
+                            <i id="handIcon" class="fas fa-hand-sparkles"></i>
+                        </button>
+
+
+                        <button id="chatbutton" class="btn btn-outline-light me-4" type="button"
+                            style="border-radius: 4em; font-size: 1em;">
+                            <i id="chaticon" class="fas fa-comment"></i>
+                        </button>
+
+                        <button class="btn btn-success" id="join-leave-button" type="button"
+                            style="border-radius: 4em; font-size: 1em;">
+                            <i class="fas fa-phone"></i>
+                        </button>
+
+
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.agora.io/sdk/release/AgoraRTC_N.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+
+    <script src="{% static 'videoapp/js/main.js' %} "></script>
+
+</body>
+
+</html>

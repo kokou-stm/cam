@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemple de traducteur Azure</title>
+</head>
+<body>
+    <h1>Exemple de traducteur Azure</h1>
+    <p>Vérifiez la console pour voir le texte traduit.</p>
+    
+    <script>
+        const subscriptionKey = '25f4057ecdca471ebe9712b99e2567e4';
+        const endpoint = 'https://api.cognitive.microsofttranslator.com/';
+        const region = 'westus'; // Par exemple 'westeurope'
+
+     
+        const path = '/translate?api-version=3.0';
+        const targetLanguage = 'fr';
+
+        async function translateText(text) {
+            const url = `${endpoint}${path}&to=${targetLanguage}`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Ocp-Apim-Subscription-Key': subscriptionKey,
+                    'Ocp-Apim-Subscription-Region': region,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify([{ 'Text': text }])
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                //console.log(JSON.stringify(data, null, 4));
+                //const data = await response.json();
+            const translatedText = data[0].translations[0].text;
+            console.log(translatedText);
+            return translatedText;
+            } else {
+                console.error('Erreur de traduction:', response.statusText);
+                return "";
+            }
+            
+        }
+
+
+
+
+        async   function synthesizeSpeech(text) {
+    const speechConfig1 = SpeechSDK.SpeechConfig.fromSubscription("2479e231dd5a4662af2c0a9b2396ab07", "eastus");
+    const audioConfig1 = SpeechSDK.AudioConfig.fromDefaultSpeakerOutput();
+    speechConfig1.speechSynthesisVoiceName = "en-US-DavisNeural"; 
+    
+    const speechSynthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig1, audioConfig1);
+    //text =  translateText(text);
+    console.log(text)
+    speechSynthesizer.speakTextAsync(
+        text,
+        result => {
+            if (result) {
+                speechSynthesizer.close();
+                return result.audioData;
+            }
+        },
+        error => {
+            console.log(error);
+            speechSynthesizer.close();
+        }
+    );
+    }
+    
+    
+    
+        // Exemple d'utilisation
+        translateText('Hello how are you ?');
+
+        
+        function startSpeechRecognition(remoteAudioTrack) {
+        // Convertir la piste audio en MediaStream
+        speechConfig.speechRecognitionLanguage = "fr-FR";
+        let mediaStream = new MediaStream([remoteAudioTrack.getMediaStreamTrack()]);
+        audioConfig = SpeechSDK.AudioConfig.fromStreamInput(mediaStream);
+
+        // Créer le reconnaisseur de discours
+        recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+        
+        recognizer.recognized = async (s, e) => {
+            if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                console.log(e.result.text)
+                const translatedText = await  translateText(e.result.text); //e.result.text; //
+                document.getElementById('output').innerText = ` ${translatedText}`;
+                console.log("using: ")
+                //await synthesizeSpeech(translatedText)
+            } else if (e.result.reason === SpeechSDK.ResultReason.NoMatch) {
+                document.getElementById('output').innerText = "No speech could be recognized.";
+            }
+        };
+        
+        recognizer.startContinuousRecognitionAsync(
+            () => {
+                //document.getElementById('startButton').disabled = true;
+                //document.getElementById('stopButton').disabled = false;
+                console.log("Recognition started");
+            },
+            err => {
+                console.error(err);
+            }
+        );
+        // Gérer les événements de reconnaissance
+        /* recognizer.recognized = function(s, e) {
+            if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                document.getElementById('output').innerText = `Recognized: ${e.result.text}`;
+                console.log(`RECOGNIZED: Text=${e.result.text}`);
+                //displayTranscription(e.result.text);
+            } else if (e.result.reason === SpeechSDK.ResultReason.NoMatch) {
+                console.log("No speech could be recognized.");
+                document.getElementById('output').innerText = `Recognized: ${e.result.text}`;
+            }
+        };
+    
+        recognizer.recognizeOnceAsync();
+        */
+    }
+    
+
+       /* document.addEventListener("DOMContentLoaded", () => {
+          let microphonebut = document.getElementById("microphonebut");
+          let microphoneicon = document.getElementById("microphoneicon");
+        
+          microphonebut.addEventListener("click", () => {
+            localAudioTrack.setEnabled(!localAudioTrack.enabled);
+            if (microphoneicon.classList.contains("fa-microphone")) {
+              microphoneicon.classList.remove("fa-microphone");
+              microphoneicon.classList.add("fa-microphone-slash");
+              
+                    } else {
+                      microphoneicon.classList.remove("fa-microphone-slash");
+                        microphoneicon.classList.add("fa-microphone");
+                        //user.audioTrack.setEnabled(!user.audioTrack.enabled);
+                    }
+          });
+      });*/
+       
+    </script>
+</body>
+</html>

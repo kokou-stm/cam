@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+  
+    
+</head>
+<body>
+    <h1>Hello</h1>
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button id="startButton" class="btn btn-outline-light me-2 " onclick="voice()" style="border-radius: 3em;">Start</button>
+        <button id="stopButton"  class="btn btn-outline-light " style="border-radius: 3em;" disabled>Stop</button>
+       </div>
+    <div class="row">
+        <label for="output" >Transcript </label>
+        <div id="output"></div>
+    </div>
+
+
+  <script>
+
+async   function synthesizeSpeech(text) {
+const speechConfig1 = SpeechSDK.SpeechConfig.fromSubscription("1329f3d781794f40bad4cf92f9a10d34", "eastus");
+const audioConfig1 = SpeechSDK.AudioConfig.fromDefaultSpeakerOutput();
+speechConfig1.speechSynthesisVoiceName = "en-US-DavisNeural"; 
+
+const speechSynthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig1, audioConfig1);
+//text =  translateText(text);
+console.log(text)
+speechSynthesizer.speakTextAsync(
+    text,
+    result => {
+        if (result) {
+            speechSynthesizer.close();
+            return result.audioData;
+        }
+    },
+    error => {
+        console.log(error);
+        speechSynthesizer.close();
+    }
+);
+}
+
+
+async function voice(){
+    synthesizeSpeech('Hello boss how are you ?')
+}
+   
+  </script>
+</body>
+</html>

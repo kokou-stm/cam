@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+   
+   <style>
+        @import url("https://fonts.googleapis.com/css2?family=Redressed&family=Merriweather:wght@300;400;700&display=swap");
+        .redressed {
+            font-family: "Redressed", serif;
+        }
+        .merriweather {
+            font-family: "Merriweather", serif;
+        }
+        .video-container {
+            margin-bottom: 15px;
+        }
+    </style>
+
+<style>
+    .player-container {
+       position: relative;
+        width: 400px;
+        height: 300px;
+        background-color: #000;
+        margin: 10px;
+    }
+    .video-container {
+        width: 100%;
+        height: 100%;
+    }
+    .controls-container {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    .controls-container button {
+        margin: 5px;
+    }
+
+
+</style>
+     <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+  
+    
+  
+    </head>
+  <body class="merriweather" style="background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));">
+   
+    <div class="container mt-5 justify-content-center align-items-center">
+        <div class="card text-center" style="background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));">
+            <div class="card-header  text-light"> 
+                <div class="row redressed">
+                    <div class="col">
+                        <label for="languageSelect">Langue</label>
+                        <select id="languageSelect">
+                            <!--option value="Origin">Origin</option-->
+                            <option value="en-US">English</option>
+                            <option value="fr-FR">French</option>
+                            <option value="es-ES">Spanish</option>
+                            <option value="zh-CN">Chinese</option>
+                            <option value="hi-IN">Hindi</option>
+                            <!-- Ajoutez d'autres options de langue selon vos besoins -->
+                        </select>
+
+                        
+                    </div>
+                     <div class="col">
+                       Video Call
+                     <button  id="handpopup" class="btn btn-danger mr-2" type="button" style="visibility: hidden; border-radius: 4em; font-size: 1em;" > 
+                       <i  class="fas fa-hand-point-up"></i> kokou
+                    </button>
+                   </div>
+                    <div class="col">
+                     <p id="timecounter">00:00</p> 
+                    </div>
+                </div>
+            </div>
+            <div class="card-body ">
+                <div class="row " id="video-grid">       
+            </div>
+            <div class="card-footer text-muted ">
+                <!--div class="btn-group" role="group" aria-label="Basic example">
+                <button id="startButton" class="btn btn-outline-light me-2 " style="border-radius: 3em;">Start</button>
+                <button id="stopButton"  class="btn btn-outline-light " style="border-radius: 3em;" disabled>Stop</button>
+               </div-->
+                <div class="row">
+                    <label for="output" >Transcript </label>
+                    <div id="output"></div>
+                </div>
+            </div>
+        </div>
+       </div>
+        <div class="card mt-2" style="background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));  border: solid rgb(167, 152, 152) 1px; border-radius: 2em;">
+           
+            
+            <div class="card-footer  py-2" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)); border-radius: 2em;">
+                <div class="d-flex justify-content-center">
+                  <div class="btn-group" role="group" aria-label="Basic example">
+                      
+                      <button id="videobutton" class="btn btn-outline-light me-2" type="button" style="border-radius: 4em; font-size: 1em;">
+                          <i id="videoicon" class="fas fa-video"></i>
+                      </button>
+                      <button  id="microphonebut"  class="btn btn-outline-light me-2" type="button" style="border-radius: 4em; font-size: 1em;" > 
+                          <i id="microphoneicon" class="fas fa-microphone"></i> 
+                      </button>
+                     
+                      <button id="screenShareButton" class="btn btn-outline-light me-2" type="button" style="border-radius: 4em; font-size: 1em;" > 
+                          <i id="screenShareIcon" class="fas fa-desktop"></i>
+                       </button>
+                      <button id="handButton" class="btn btn-outline-light me-2" type="button" style="border-radius: 4em; font-size: 1em;" > 
+                          <i id="handIcon" class="fas fa-hand-sparkles"></i>
+                       </button>
+  
+  
+                       <button id="chatbutton" class="btn btn-outline-light me-4" type="button" style="border-radius: 4em; font-size: 1em;" > 
+                          <i id="chaticon" class="fas fa-comment"></i>
+                       </button>
+  
+                       <button class="btn btn-success" id="join-leave-button" type="button" style="border-radius: 4em; font-size: 1em;" > 
+                          <i class="fas fa-phone"></i>
+                       </button>
+  
+                      
+  
+                     
+                  </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+    <script src="https://cdn.agora.io/sdk/release/AgoraRTC_N.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+  
+   
+    
+
+
+<script>
+ 
+    // Initialiser les variables globales
+    let subscriptionKey = "8f33bcec46e842318809a0e94dcdaa04";
+    let serviceRegion = "eastus"; 
+    let speechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
+    
+    let audioConfig;
+    let recognizer;
+    
+    
+       var targetLanguage = 'en';
+
+        async function translateText(text ) {
+            const subscriptionKey = '25f4057ecdca471ebe9712b99e2567e4';
+            const endpoint = 'https://api.cognitive.microsofttranslator.com/';
+            const region = 'westus'; // Par exemple 'westeurope'
+
+        
+            const path = '/translate?api-version=3.0';
+            //const targetLanguage = 'fr';
+            console.log("for trans: ", targetLanguage)
+            const url = `${endpoint}${path}&to=${document.getElementById('languageSelect').value}`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Ocp-Apim-Subscription-Key': subscriptionKey,
+                    'Ocp-Apim-Subscription-Region': region,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify([{ 'Text': text }])
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                //console.log(JSON.stringify(data, null, 4));
+                //const data = await response.json();
+            const translatedText = data[0].translations[0].text;
+            console.log(translatedText);
+            return translatedText;
+            } else {
+                console.error('Erreur de traduction:', response.statusText);
+                return "";
+            }
+            
+        }
+    async   function synthesizeSpeech(text) {
+    const speechConfig1 = SpeechSDK.SpeechConfig.fromSubscription("8f33bcec46e842318809a0e94dcdaa04", "eastus");
+    const audioConfig1 = SpeechSDK.AudioConfig.fromDefaultSpeakerOutput();
+    const voicename1 = await getVoicesForLanguage()
+    speechConfig1.speechSynthesisVoiceName = voicename1[voicename1.length -1] //"en-US-DavisNeural"; 
+    console.log("voicename: ",  voicename1[voicename1.length -1])
+    //speechConfig.speechSynthesisLanguage = targetLanguage; 
+    
+    const speechSynthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig1, audioConfig1);
+    //text =  translateText(text);
+    console.log(text)
+    speechSynthesizer.speakTextAsync(
+        text,
+        result => {
+            if (result) {
+                speechSynthesizer.close();
+                return result.audioData;
+            }
+        },
+        error => {
+            console.log(error);
+            speechSynthesizer.close();
+        }
+    );
+    }
+    
+    
+    
+    
+    // Fonction pour initialiser le SpeechRecognizer avec une piste audio distante
+    function startSpeechRecognition(remoteAudioTrack) {
+        // Convertir la piste audio en MediaStream
+        speechConfig.speechRecognitionLanguage = "fr-FR";
+        let mediaStream = new MediaStream([remoteAudioTrack.getMediaStreamTrack()]);
+        audioConfig = SpeechSDK.AudioConfig.fromStreamInput(mediaStream);
+    
+        // Créer le reconnaisseur de discours
+        recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+        
+        recognizer.recognized = async (s, e) => {
+            if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                console.log(e.result.text)
+                const translatedText = await  translateText(e.result.text); //e.result.text; //
+                document.getElementById('output').innerText = ` ${translatedText}`;
+                await synthesizeSpeech(translatedText)
+            } else if (e.result.reason === SpeechSDK.ResultReason.NoMatch) {
+                document.getElementById('output').innerText = "No speech could be recognized.";
+            }
+        };
+        
+        recognizer.startContinuousRecognitionAsync(
+            () => {
+                //document.getElementById('startButton').disabled = true;
+                //document.getElementById('stopButton').disabled = false;
+                console.log("Recognition started");
+            },
+            err => {
+                console.error(err);
+            }
+        );
+        // Gérer les événements de reconnaissance
+        /* recognizer.recognized = function(s, e) {
+            if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                document.getElementById('output').innerText = `Recognized: ${e.result.text}`;
+                console.log(`RECOGNIZED: Text=${e.result.text}`);
+                //displayTranscription(e.result.text);
+            } else if (e.result.reason === SpeechSDK.ResultReason.NoMatch) {
+                console.log("No speech could be recognized.");
+                document.getElementById('output').innerText = `Recognized: ${e.result.text}`;
+            }
+        };
+    
+        recognizer.recognizeOnceAsync();
+        */
+    }
+    
+    // Fonction pour afficher la transcription
+    function displayTranscription(text) {
+        let transcriptionElement = document.getElementById("transcription");
+        transcriptionElement.innerText += text + "\n";
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    let token = ''; // Sera mis à jour dynamiquement
+    const APP_ID = "f2891190d713482dbed4c3fd804ec233"
+    const CHANNEL_NAME = "channel1"
+        
+    let agoraEngine;
+    let localAudioTrack;
+    let localVideoTrack;
+    let isJoined = false;
+    let videoGrid = document.getElementById('video-grid');
+    
+    async function fetchToken() {
+        const response = await fetch('/generate_agora_token/');
+        const data = await response.json();
+        token = data.token;
+        
+        initializeAgora();
+    }
+    
+    async function initializeAgora() {
+        agoraEngine = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+    
+        agoraEngine.on('user-published', async (user, mediaType) => {
+            await agoraEngine.subscribe(user, mediaType);
+            
+            if (mediaType === 'video') {
+                const remoteVideoTrack = user.videoTrack;
+                const remotePlayerContainer = createPlayerContainer(user.uid.toString());
+                videoGrid.appendChild(remotePlayerContainer);
+                remoteVideoTrack.play(remotePlayerContainer.querySelector('.video-container'));
+                //addControlButtons(remotePlayerContainer, false, user);
+            }
+            
+            // Initialiser la piste audio distante et commencer la reconnaissance vocale
+            if (mediaType === 'audio') {
+                console.log('start recognition');
+                const remoteAudioTrack = user.audioTrack;
+                //remoteAudioTrack.play(); // Auto-play remote audio track
+                
+                startSpeechRecognition(remoteAudioTrack); // Start speech recognition
+            }
+    
+           
+        });
+    
+        agoraEngine.on('user-unpublished', user => {
+            const remotePlayerContainer = document.getElementById(user.uid.toString());
+            if (remotePlayerContainer) {
+                remotePlayerContainer.remove();
+            }
+        });
+    
+        
+        await agoraEngine.join(APP_ID, CHANNEL_NAME, token, null);
+    
+        localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+        localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+    
+        const localPlayerContainer = createPlayerContainer('local-player');
+        videoGrid.appendChild(localPlayerContainer);
+    
+        localVideoTrack.play(localPlayerContainer.querySelector('.video-container'));
+    
+        await agoraEngine.publish([localAudioTrack, localVideoTrack]);
+    
+        //addControlButtons(localPlayerContainer, true);
+    
+       
+       
+    }
+    
+    function createPlayerContainer(id) {
+        const container = document.createElement('div');
+        container.id = id;
+        container.className = 'player-container';
+    
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'video-container';
+        container.append(videoContainer);
+    
+        const controlsContainer = document.createElement('div');
+        controlsContainer.className = 'controls-container';
+        container.append(controlsContainer);
+    
+        const containercol = document.createElement('div');
+        containercol.className = 'col';
+        containercol.append(container);
+        return containercol;
+    
+    }
+    
+    function addControlButtons(container, isLocal, user) {
+        const controlsContainer = container.querySelector('.controls-container');
+    
+        const muteAudioButton = document.createElement('button');
+        muteAudioButton.textContent = 'Mute Audio';
+        muteAudioButton.onclick = () => {
+            if (isLocal) {
+                localAudioTrack.setEnabled(!localAudioTrack.enabled);
+                muteAudioButton.textContent = localAudioTrack.enabled ? 'Mute Audio' : 'Unmute Audio';
+            } else {
+                user.audioTrack.setEnabled(!user.audioTrack.enabled);
+                muteAudioButton.textContent = user.audioTrack.enabled ? 'Mute Audio' : 'Unmute Audio';
+            }
+        };
+        controlsContainer.append(muteAudioButton);
+    
+        const muteVideoButton = document.createElement('button');
+        muteVideoButton.textContent = 'Mute Video';
+        muteVideoButton.onclick = () => {
+            if (isLocal) {
+                localVideoTrack.setEnabled(!localVideoTrack.enabled);
+                muteVideoButton.textContent = localVideoTrack.enabled ? 'Mute Video' : 'Unmute Video';
+            } else {
+                user.videoTrack.setEnabled(!user.videoTrack.enabled);
+                muteVideoButton.textContent = user.videoTrack.enabled ? 'Mute Video' : 'Unmute Video';
+            }
+        };
+        controlsContainer.append(muteVideoButton);
+    
+        const leaveButton = document.createElement('button');
+        leaveButton.textContent = 'Leave';
+        leaveButton.onclick = () => {
+            if (isLocal) {
+                
+    
+                agoraEngine.leave();
+                container.remove();
+               
+                document.getElementById('join-leave-button').className = 'btn btn-success';
+    
+                isJoined = false;
+            } else {
+               
+                agoraEngine.unsubscribe(user);
+                container.remove();
+            }
+        };
+        controlsContainer.append(leaveButton);
+    }
+    
+    document.getElementById('join-leave-button').onclick = async () => {
+        if (isJoined) {
+           
+            agoraEngine.leave();
+            //localTracks.videoTrack.stop();
+            //localTracks.videoTrack.close();
+            
+            document.querySelectorAll('.player-container').forEach(container => container.remove());
+            document.getElementById('join-leave-button').className = 'btn btn-success';
+            isJoined = false;
+        } else {
+            await fetchToken();
+           
+            
+            document.getElementById('join-leave-button').className = 'btn btn-danger';
+            isJoined = true;
+        }
+    };
+    
+    
+    document.addEventListener("DOMContentLoaded", () => {
+          let microphonebut = document.getElementById("microphonebut");
+          let microphoneicon = document.getElementById("microphoneicon");
+        
+          microphonebut.addEventListener("click", () => {
+            localAudioTrack.setEnabled(!localAudioTrack.enabled);
+            if (microphoneicon.classList.contains("fa-microphone")) {
+              microphoneicon.classList.remove("fa-microphone");
+              microphoneicon.classList.add("fa-microphone-slash");
+              
+                    } else {
+                      microphoneicon.classList.remove("fa-microphone-slash");
+                        microphoneicon.classList.add("fa-microphone");
+                        //user.audioTrack.setEnabled(!user.audioTrack.enabled);
+                    }
+          });
+      });
+        
+        
+      document.addEventListener("DOMContentLoaded", () => {
+          let videobutton = document.getElementById("videobutton");
+          let videoicon = document.getElementById("videoicon");
+        
+          videobutton.addEventListener("click", () => {
+            localVideoTrack.setEnabled(!localVideoTrack.enabled);
+            if (videoicon.classList.contains("fa-video")) {
+                videoicon.classList.remove("fa-video");
+                videoicon.classList.add("fa-video-slash");
+                
+                    } else {
+                        videoicon.classList.remove("fa-video-slash");
+                        videoicon.classList.add("fa-video");
+                       // user.videoTrack.setEnabled(!user.videoTrack.enabled);
+                    }
+          });
+      });
+        
+    
+    
+      document.addEventListener("DOMContentLoaded", () => {
+          let chatbutton = document.getElementById("chatbutton");
+          let chaticon = document.getElementById("chaticon");
+        
+          chatbutton.addEventListener("click", () => {
+              
+            if (chaticon.classList.contains("fa-comment")) {
+              chaticon.classList.remove("fa-comment");
+              chaticon.classList.add("fa-comments");
+              document.getElementById("chatarea").style.display='block';
+             
+                    } else {
+                      chaticon.classList.remove("fa-comments");
+                      chaticon.classList.add("fa-comment");
+                      document.getElementById("chatarea").style.display='none';
+                    }
+          });
+      });
+        </script>
+    
+    
+    
+    <script>
+           //let recognizer;
+    
+ 
+    document.getElementById('languageSelect').addEventListener('change', (event) => {
+    targetLanguage = event.target.value;
+   
+    console.log(targetLanguage);
+});
+    
+    </script>
+        <script>
+              document.addEventListener("DOMContentLoaded", () => {
+          const handButton = document.getElementById("handButton");
+          const handIcon = document.getElementById("handIcon");
+    
+          handButton.addEventListener("click", () => {
+              if (document.getElementById("handpopup").style.visibility == "hidden") {
+                document.getElementById("handpopup").style.visibility = "visible";
+                handIcon.classList.remove("fa-hand-sparkles");
+                handIcon.classList.add("fa-hand-peace");
+                 
+              } else {
+                document.getElementById("handpopup").style.visibility = "hidden";
+                handIcon.classList.remove("fa-hand-peace");
+                handIcon.classList.add("fa-hand-sparkles");
+              }
+          });
+      });
+    
+    
+    
+      document.addEventListener("DOMContentLoaded", () => {
+                const screenShareButton = document.getElementById("screenShareButton");
+                const screenShareIcon = document.getElementById("screenShareIcon");
+    
+                screenShareButton.addEventListener("click", () => {
+                    if (screenShareIcon.classList.contains("fa-desktop")) {
+                        screenShareIcon.classList.remove("fa-desktop");
+                        screenShareIcon.classList.add("fa-times");
+                    } else {
+                        screenShareIcon.classList.remove("fa-times");
+                        screenShareIcon.classList.add("fa-desktop");
+                    }
+                });
+            });
+    
+    
+    
+            document.addEventListener("DOMContentLoaded", () => {
+          const timeDisplay = document.getElementById("timecounter");
+          const startTime = Date.now();
+    
+          function updateElapsedTime() {
+              const currentTime = Date.now();
+              const distance = currentTime - startTime;
+              const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+              const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+              const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+              const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+      // Display the result in the element with id="demo"
+     // document.getElementById("timecounter").innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+     document.getElementById("timecounter").innerHTML =  hours + "h " + minutes + "m " + seconds + "s ";
+    
+              
+          }
+    
+          setInterval(updateElapsedTime, 1000);
+      });
+    
+    
+    
+
+
+      async function getVoicesForLanguage() {
+    const subscriptionKey = "8f33bcec46e842318809a0e94dcdaa04";
+    const region = "eastus";
+    const endpoint = `https://${region}.tts.speech.microsoft.com/cognitiveservices/voices/list`;
+
+    const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            'Ocp-Apim-Subscription-Key': subscriptionKey
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const voices = await response.json();
+   
+   console.log(voices)
+
+   const voiceNames = voices
+    .filter(voice => 
+        voice.Locale.includes(document.getElementById('languageSelect').value) &&
+        voice.Gender === 'Male'
+    )
+    .map(voice => voice.ShortName);
+
+    
+        
+    console.log(voiceNames)
+    return voiceNames;
+}
+
+
+      
+        </script>
+
+
+<script>
+    
+    /*
+
+       document.getElementById('startButton').addEventListener('click', async function () {
+        const speechConfig = SpeechSDK.SpeechConfig.fromSubscription("2479e231dd5a4662af2c0a9b2396ab07", "eastus");
+        speechConfig.speechRecognitionLanguage = "fr-FR";  // Configuration de la langue en français
+    
+        const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+        recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+    
+        recognizer.recognizing = (s, e) => {
+            document.getElementById('output').innerText = `Recognizing: ${e.result.text}`;
+        };
+    
+        recognizer.recognized = async (s, e) => {
+            if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                const translatedText = await  translateText(e.result.text);
+                document.getElementById('output').innerText = `Recognized: ${translatedText}`;
+                await synthesizeSpeech(translatedText)
+            } else if (e.result.reason === SpeechSDK.ResultReason.NoMatch) {
+                document.getElementById('output').innerText = "No speech could be recognized.";
+            }
+        };
+    
+        recognizer.startContinuousRecognitionAsync(
+            () => {
+                document.getElementById('startButton').disabled = true;
+                document.getElementById('stopButton').disabled = false;
+            },
+            err => {
+                console.error(err);
+            }
+        );
+    });
+
+   
+    document.getElementById('stopButton').addEventListener('click', function () {
+        recognizer.stopContinuousRecognitionAsync(
+            () => {
+                document.getElementById('startButton').disabled = false;
+                document.getElementById('stopButton').disabled = true;
+            },
+            err => {
+                console.error(err);
+            }
+        );
+    });
+    
+   
+    /*
+</script>
+    
+  </body>
+</html>

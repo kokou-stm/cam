@@ -1,0 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Redressed&family=Merriweather:wght@300;400;700&display=swap");
+.redressed {
+    font-family: "Redressed", serif;
+}
+.merriweather {
+    font-family: "Merriweather", serif;
+}
+.video-container {
+    margin-bottom: 15px;
+}

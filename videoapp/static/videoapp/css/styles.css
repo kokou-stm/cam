@@ -1,0 +1,85 @@
+@import url("https://fonts.googleapis.com/css2?family=Redressed&family=Merriweather:wght@300;400;700&display=swap");
+.redressed {
+    font-family: "Redressed", serif;
+}
+.merriweather {
+    font-family: "Merriweather", serif;
+}
+.video-container {
+    margin-bottom: 15px;
+}
+
+
+   /* Grille vidéo */
+#video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Ajuste les colonnes dynamiquement */
+    grid-gap: 10px;
+    background-color: #222; /* Ajoute un fond sombre pour le contraste */
+    padding: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    max-height: 60vh; /* Limite la hauteur totale du grid */
+    overflow-y: auto; /* Permet de scroller si nécessaire */
+    position: relative; /* Permet de positionner les éléments en absolu à l'intérieur */
+    width: 100%; /* Assure que la grille prend toute la largeur du parent */
+}
+
+/* Conteneur du joueur vidéo */
+.player-container {
+    position: relative;
+    background-color: #000;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Conteneur vidéo */
+.video-container {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* S'assure que la vidéo couvre entièrement l'espace sans distorsion */
+}
+
+/* Conteneur des contrôles */
+.controls-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    display: none; /* Masquer les boutons de contrôle par défaut */
+}
+
+/* Affichage des contrôles au survol */
+.player-container:hover .controls-container {
+    display: block; /* Afficher les boutons de contrôle au survol */
+}
+
+/* Boutons de contrôle */
+.controls-container button {
+    margin: 5px;
+    background-color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #333;
+}
+
+/* Boutons de contrôle au survol */
+.controls-container button:hover {
+    background-color: #ddd;
+}
+
+/* Style spécifique pour l'écran partagé */
+.screen-share-active {
+    grid-column: 1 / -1; /* Prend toute la largeur de la grille */
+    grid-row: 1 / -1; /* Prend toute la hauteur de la grille */
+    z-index: 10; /* Se superpose aux autres vidéos */
+    position: absolute; /* S'assure que l'élément est positionné par rapport au parent */
+    top: 0;
+    left: 0;
+    width: 100%; /* Prend toute la largeur disponible */
+    height: 100%; /* Prend toute la hauteur disponible */
+}

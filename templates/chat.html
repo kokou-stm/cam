@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Language Learning</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+   
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Redressed&family=Merriweather:wght@300;400;700&display=swap");
+        @import url("https://font.googleapis.com/css?family=Poppins:200, 300,400,500,600,7ù00,800,900&display=swap");
+        .redressed{
+        font-family:"Redressed", serif;
+
+        }
+
+        .merriweather{
+        font-family:"Merriweather", serif; 
+        }
+        
+        .main-content {
+      margin-left: 14em; /* Ajustez cette valeur pour correspondre à la largeur de votre barre latérale */
+    }
+    </style>
+</head>
+
+  <body style="background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5)); ">
+   
+    
+    <div class="container-fluid" >
+        <div class="row " >
+          <!-- Barre latérale gauche -->
+          <nav class="col-md-2 d-none d-md-block bg-dark sidebar fixed-top h-100 redressed" >
+            <div class="sidebar-sticky">
+              <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                Sidebar
+              </h5>
+              <ul class="nav flex-column " style="background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));">
+                <li class="nav-item">
+                  <a class="nav-link active text-light" href="#">Accueil</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-light" href="#">Profil</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-light" href="#">Paramètres</a>
+                </li>
+                <!-- Ajoutez d'autres éléments de menu ici -->
+              </ul>
+            </div>
+          </nav>
+    
+          <!-- Contenu principal -->
+          <div role="main"  class="col-md-10 ml-md-auto px-4 main-content text-center redressed mt-5">
+            <!-- Contenu de la page -->
+             <div class="row">
+           <div class="col-md-10"> <h4 class="merriweather text-light">Your English Friend</h4></div>
+           <div class="col-md-2"><a id="chatbutton_1" href="" class="btn btn-outline-light me-4" type="button" style="border-radius: 4em; font-size: 1em;" > 
+            <i id="chaticon_1" class="fas fa-home" ></i>
+        </a></div>
+            
+        </div>
+            <p class="merriweather"></p>
+            <div class="card text-center h-100" style="">
+                <div class="card-header">
+                  <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6">
+                      <p>Welcome, what do you want to learn  today?</p>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="btn-group">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Small button
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li>Option1</li>
+                          <li>Option2</li>
+                        </ul>
+                      </div>
+                      
+                    </div>
+                  </div>
+                 
+                 
+                </div>
+                <div id="chatarea" class="card-body overflow-auto" style="background: linear-gradient(rgba(0, 0, 0, 0.5),
+                rgba(0,0,0, 0.5));">
+                  <h5 class="card-title mb-4">Special title treatment</h5>
+
+                
+
+                  
+                </div>
+               
+            </div>
+            <div class="container  text-center mt-3 fixed-bottom  py-3 card-footer w-50" style=" margin-left: 30em;
+            border-radius: 4em; border: solid 1px rgb(66, 62, 62); background: rgb(33, 33, 34)" >
+                
+                <form class="d-flex " role="search " method="post">
+                  {%csrf_token%}
+                    <input id="chat" class="text-light form-control bg-transparent" autocomplete="off" type="search" style="border: 1px 1px 1px 0px ; border-left:0px; margin-left:2em; border-radius: 4em;" placeholder="Your Message" aria-label="Search">
+                    <button class="btn btn-outline-light" style="border-radius: 4em;"  type="submit"><i class="fas fa-paper-plane"></i></button>
+                    <a  id="microphonebut" href="#" class="btn btn-outline-light mx-2" type="button" style="border-radius: 4em; font-size: 1em;" > 
+                      <i id="microphoneicon" class="fas fa-microphone"></i> 
+                    </a>
+                    
+                </form>
+                  
+            
+                </div>
+           
+            
+          </div>
+        </div>
+    </div>
+
+
+ <script>
+ function getCookie(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+
+        document.getElementById("chat").addEventListener("keydown", async function(event) {
+            if (event.key == 'Enter') {
+                var inputValue = event.target.value;
+                event.preventDefault();
+
+                var rowDiv = document.createElement('div');
+                rowDiv.className = 'row ';
+
+                var colDiv1 = document.createElement('div');
+                colDiv1.className = 'col-md-6';
+                colDiv1.style = "display: block";
+
+                var colDiv2 = document.createElement('div');
+                colDiv2.className = 'col-md-6 ';
+
+                var inputGroupDiv = document.createElement('div');
+                inputGroupDiv.className = 'input-group mb-3';
+
+                var formFloatingDiv = document.createElement('div');
+                formFloatingDiv.className = 'form-floating';
+                formFloatingDiv.style = 'border-radius: 4em; font-size: 1em; background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));';
+
+                var messageText = document.createElement('p');
+                messageText.className = 'card-text text-light py-2 px-2';
+                messageText.textContent = inputValue;
+
+                var buttonDiv = document.createElement('div');
+
+                var userIconButton = document.createElement('button');
+                userIconButton.className = 'btn btn-outline-light';
+                userIconButton.type = 'button';
+                userIconButton.style = 'border-radius: 4em; font-size: 1em; background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));';
+                userIconButton.innerHTML = '<i class="fas fa-user"></i>';
+
+                formFloatingDiv.appendChild(messageText);
+                buttonDiv.appendChild(userIconButton);
+                inputGroupDiv.appendChild(formFloatingDiv);
+                inputGroupDiv.appendChild(buttonDiv);
+                colDiv2.appendChild(inputGroupDiv);
+                rowDiv.appendChild(colDiv1);
+                rowDiv.appendChild(colDiv2);
+
+                var chatArea = document.getElementById("chatarea");
+                chatArea.appendChild(rowDiv);
+
+                chatArea.scrollTop = chatArea.scrollHeight;
+
+                try {
+                    const response = await fetch("{% url 'chat_view' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({ user_input: inputValue })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Request failed with status ' + response.status);
+                    }
+
+                    const data = await response.json();
+                    const response_text = data.text;
+
+                    // Create new row for the bot response
+                    var botRowDiv = document.createElement('div');
+                    botRowDiv.className = 'row mb-3';
+
+                    var botColDiv1 = document.createElement('div');
+                    botColDiv1.className = 'col-md-6';
+                    botColDiv1.style = "display: block";
+
+                    var botColDiv2 = document.createElement('div');
+                    botColDiv2.className = 'col-md-6 ';
+
+                    var botInputGroupDiv = document.createElement('div');
+                    botInputGroupDiv.className = 'input-group mb-3';
+
+                    var botFormFloatingDiv = document.createElement('div');
+                    botFormFloatingDiv.className = 'form-floating';
+                    botFormFloatingDiv.style = 'border-radius: 2em; font-size: 1em; background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0,0,0, 0.5));';
+
+                    var botMessageText = document.createElement('p');
+                    botMessageText.className = 'card-text text-light py-2 px-2';
+
+
+                    
+                    var messageText = document.createElement('p');
+                    messageText.className = 'card-text text-light';
+                    messageText.textContent = response_text;
+
+                    
+
+                    var botButtonDiv = document.createElement('div');
+
+                    var botIconButton = document.createElement('button');
+                    botIconButton.className = 'btn btn-outline-light';
+                    botIconButton.type = 'button';
+                    botIconButton.style = 'border-radius: 4em; font-size: 1em; background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));';
+                    botIconButton.innerHTML = '<i class="fas fa-brain"></i>';
+
+                    botFormFloatingDiv.appendChild(botMessageText);
+                    botMessageText.appendChild(messageText);
+                    botButtonDiv.appendChild(botIconButton);
+                    botInputGroupDiv.appendChild(botButtonDiv);
+                    botInputGroupDiv.appendChild(botFormFloatingDiv);
+                    botColDiv1.appendChild(botInputGroupDiv);
+                    botRowDiv.appendChild(botColDiv1);
+                    botRowDiv.appendChild(botColDiv2);
+
+                    var chatArea = document.getElementById("chatarea");
+                    chatArea.appendChild(botRowDiv);
+                    chatArea.scrollTop = chatArea.scrollHeight;
+
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+
+                event.target.value = '';
+            }
+        });
+        </script>
+   
+
+   <script>
+  async   function synthesizeSpeech(text) {
+const speechConfig1 = SpeechSDK.SpeechConfig.fromSubscription("2479e231dd5a4662af2c0a9b2396ab07", "eastus");
+const audioConfig1 = SpeechSDK.AudioConfig.fromDefaultSpeakerOutput();
+speechConfig1.speechSynthesisVoiceName = "en-US-DavisNeural"; 
+
+const speechSynthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig1, audioConfig1);
+//text =  translateText(text);
+console.log(text)
+speechSynthesizer.speakTextAsync(
+    text,
+    result => {
+        if (result) {
+            speechSynthesizer.close();
+            return result.audioData;
+        }
+    },
+    error => {
+        console.log(error);
+        speechSynthesizer.close();
+    }
+);
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+   let microphonebut = document.getElementById("microphonebut");
+   let microphoneicon = document.getElementById("microphoneicon");
+   let isMicrophoneActive = false;
+   let recognizer;
+
+   // Clé de subscription Azure et région (remplacez par vos propres informations)
+   const subscriptionKey = "2479e231dd5a4662af2c0a9b2396ab07";
+   const serviceRegion = "eastus";
+
+   microphonebut.addEventListener("click", () => {
+       if (isMicrophoneActive) {
+           // Désactiver le microphone
+           if (recognizer) {
+               recognizer.stopContinuousRecognitionAsync(
+                   () => {
+                       console.log("Recognition stopped.");
+                       recognizer.close();
+                       recognizer = undefined;
+                   },
+                   (err) => {
+                       console.error(err);
+                       recognizer = undefined;
+                   }
+               );
+           }
+           isMicrophoneActive = false;
+           microphoneicon.classList.remove("fa-microphone-slash");
+           microphoneicon.classList.add("fa-microphone");
+       } else {
+           // Activer le microphone
+           const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
+           speechConfig.speechRecognitionLanguage = "fr-FR"; // ou autre langue selon votre besoin
+           const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+
+           recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+           recognizer.recognizing = (s, e) => {
+               console.log(`RECOGNIZING: Text=${e.result.text}`);
+           };
+
+           recognizer.recognized = async (s, e) => {
+               if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                   console.log(`RECOGNIZED: Text=${e.result.text}`);
+                   let transcript = e.result.text;
+
+
+                   var rowDiv = document.createElement('div');
+                rowDiv.className = 'row ';
+
+                var colDiv1 = document.createElement('div');
+                colDiv1.className = 'col-md-6';
+                colDiv1.style = "display: block";
+
+                var colDiv2 = document.createElement('div');
+                colDiv2.className = 'col-md-6 ';
+
+                var inputGroupDiv = document.createElement('div');
+                inputGroupDiv.className = 'input-group mb-3';
+
+                var formFloatingDiv = document.createElement('div');
+                formFloatingDiv.className = 'form-floating';
+                formFloatingDiv.style = 'border-radius: 4em; font-size: 1em; background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));';
+
+                var messageText = document.createElement('p');
+                messageText.className = 'card-text text-light';
+                messageText.textContent = transcript;
+
+                var buttonDiv = document.createElement('div');
+
+                var userIconButton = document.createElement('button');
+                userIconButton.className = 'btn btn-outline-light';
+                userIconButton.type = 'button';
+                userIconButton.style = 'border-radius: 4em; font-size: 1em; background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));';
+                userIconButton.innerHTML = '<i class="fas fa-user"></i>';
+
+                formFloatingDiv.appendChild(messageText);
+                buttonDiv.appendChild(userIconButton);
+                inputGroupDiv.appendChild(formFloatingDiv);
+                inputGroupDiv.appendChild(buttonDiv);
+                colDiv2.appendChild(inputGroupDiv);
+                rowDiv.appendChild(colDiv1);
+                rowDiv.appendChild(colDiv2);
+
+                var chatArea = document.getElementById("chatarea");
+                chatArea.appendChild(rowDiv);
+
+
+                   try{
+                   const response = await fetch("/chat_view/", {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body:  JSON.stringify({ user_input: e.result.text }) ,
+                        
+                      
+                    });
+                    const data = await response.json();
+                    if (data.success){
+                        console.log(data.text)
+            
+                        let out = data.text;
+                        const audio_url= synthesizeSpeech(out)
+                         
+
+                        var botRowDiv = document.createElement('div');
+                    botRowDiv.className = 'row mb-3';
+
+                    var botColDiv1 = document.createElement('div');
+                    botColDiv1.className = 'col-md-6';
+                    botColDiv1.style = "display: block";
+
+                    var botColDiv2 = document.createElement('div');
+                    botColDiv2.className = 'col-md-6 ';
+
+                    var botInputGroupDiv = document.createElement('div');
+                    botInputGroupDiv.className = 'input-group mb-3';
+
+                    var botFormFloatingDiv = document.createElement('div');
+                    botFormFloatingDiv.className = 'form-floating';
+                    botFormFloatingDiv.style = 'border-radius: 4em; font-size: 1em; background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0,0,0, 0.5));';
+
+                    var botMessageText = document.createElement('p');
+                    botMessageText.className = 'card-text text-light';
+
+                    var audioElement = document.createElement('audio');
+                    audioElement.src = audio_url;
+                    audioElement.controls = true;
+
+                    var botButtonDiv = document.createElement('div');
+
+                    var botIconButton = document.createElement('button');
+                    botIconButton.className = 'btn btn-outline-light';
+                    botIconButton.type = 'button';
+                    botIconButton.style = 'border-radius: 4em; font-size: 1em; background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));';
+                    botIconButton.innerHTML = '<i class="fas fa-brain"></i>';
+
+                    botFormFloatingDiv.appendChild(botMessageText);
+                    botMessageText.appendChild(audioElement);
+                    botButtonDiv.appendChild(botIconButton);
+                    botInputGroupDiv.appendChild(botButtonDiv);
+                    botInputGroupDiv.appendChild(botFormFloatingDiv);
+                    botColDiv1.appendChild(botInputGroupDiv);
+                    botRowDiv.appendChild(botColDiv1);
+                    botRowDiv.appendChild(botColDiv2);
+                    var chatArea = document.getElementById("chatarea");
+                    chatArea.appendChild(botRowDiv);
+
+                        
+                    }
+                  } catch (error) {
+                      console.error('Error:', error);
+                      return null;
+                  }
+                   // Vous pouvez ajouter le code pour afficher ou traiter le texte reconnu ici
+               } else if (e.result.reason === SpeechSDK.ResultReason.NoMatch) {
+                   console.log("NOMATCH: No speech could be recognized.");
+               }
+           };
+
+           recognizer.canceled = (s, e) => {
+               console.error(`CANCELED: Reason=${e.reason}`);
+               if (e.reason === SpeechSDK.CancellationReason.Error) {
+                   console.error(`CANCELED: ErrorDetails=${e.errorDetails}`);
+               }
+               recognizer.stopContinuousRecognitionAsync();
+           };
+
+           recognizer.sessionStopped = (s, e) => {
+               console.log("Session stopped.");
+               recognizer.stopContinuousRecognitionAsync();
+           };
+
+           recognizer.startContinuousRecognitionAsync();
+
+           isMicrophoneActive = true;
+           microphoneicon.classList.remove("fa-microphone");
+           microphoneicon.classList.add("fa-microphone-slash");
+       }
+   });
+
+  });
+
+
+  async function chatapp(text){
+    try {
+         
+         const response = await fetch("/chat_view/", {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             'X-CSRFToken': getCookie('csrftoken'),
+         },
+         body:  JSON.stringify({ user_input: text }) ,
+            
+           
+         });
+         
+ 
+         const data = await response.json();
+         if (data.success){
+            console.log(data.text)
+ 
+            let out = data.text;
+            var rowDiva = document.createElement('div');
+             rowDiva.className = 'row mt-5';
+ 
+             var colDiva = document.createElement('div');
+             colDiva.className = 'col-md-6';
+ 
+             var colDivb = document.createElement('div');
+             colDivb.className = 'col-md-6';
+ 
+             var inputGroupDiva = document.createElement('div');
+             inputGroupDiva.className = 'input-group mb-3';
+ 
+             var formFloatingDiva = document.createElement('div');
+             formFloatingDiva.className = 'form-floating';
+             formFloatingDiva.style='border-radius: 4em; font-size: 1em; background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));'
+ 
+             var pElementa = document.createElement('p');
+             pElementa.className = 'card-text text-light';
+             pElementa.textContent = out; // Utilise la valeur de l'input
+ 
+             var buttonDiva = document.createElement('div');
+ 
+             var buttonElementa = document.createElement('button');
+             buttonElementa.className = 'btn btn-outline-light btn-custom';
+             buttonElementa.style='border-radius: 4em; font-size: 1em; background: linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.5));'
+ 
+             buttonElementa.type = 'button';
+             buttonElementa.innerHTML = '<i class="fas fa-brain"></i>';
+ 
+             // Assembler les éléments
+             formFloatingDiva.appendChild(pElementa);
+            
+             buttonDiva.appendChild(buttonElementa);
+             inputGroupDiva.appendChild(buttonDiva);
+             inputGroupDiva.appendChild(formFloatingDiva);
+             colDiv1.appendChild(inputGroupDiva);
+             rowDiva.appendChild(colDiva);
+             rowDiva.appendChild(colDivb);
+ 
+             console.log(rowDiva)
+            
+  
+             document.getElementById("chatarea").appendChild(rowDiva);
+             return  out
+ 
+         }
+         
+     } catch (error) {
+         console.error('Error:', error);
+         return null;
+     }
+  }
+ 
+   </script>
+
+  <style>
+  input::placeholder {
+    color: rgb(255, 253, 253); /* Changez cette valeur pour la couleur de votre choix */
+    opacity: 1; /* Assure que l'opacité est à 100% */
+  }</style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
+</html>
+
+
+
+
+
